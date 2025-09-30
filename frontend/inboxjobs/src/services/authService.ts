@@ -1,8 +1,13 @@
+import { InternalAxiosRequestConfig, AxiosError } from "axios";
 import { apiClient } from "./api";
 
 interface TokenResponse {
   access: string;
   refresh: string;
+}
+
+interface InternalAxiosRequestConfigWithRetry extends InternalAxiosRequestConfig {
+  _retry?: boolean;
 }
 
 export const authService = {
@@ -33,6 +38,36 @@ export const authService = {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         //
+    },
+
+    initInterceptor: (): void => {
+        apiClient.addInterceptor<any>(
+            (response) => response,
+            async (error: AxiosError): Promise<any> => {
+                const originalRequest: InternalAxiosRequestConfigWithRetry | undefined = error.config;
+                if (!originalRequest) {
+                    return Promise.reject(error);
+                }
+
+                if (error.response?.status === 401 && !originalRequest._retry) {
+                    originalRequest._retry = true;
+                    const refreshToken = localStorage.getItem("refresh_token");
+                    if (!refreshToken) {
+                        authService.logout();
+                        return Promise.reject(error);
+                    }
+                    try {
+                        await authService.refreshToken();
+                        originalRequest.headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`;
+                        return apiClient['client'](originalRequest);
+                    } catch (err) {
+                        authService.logout();
+                        return Promise.reject(err);
+                    }
+                }
+                return Promise.reject(error);
+            }
+        );
     }
 };
   

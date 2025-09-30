@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 
 type AuthMode = 'jwt' | 'session';
 
@@ -6,7 +6,7 @@ class ApiClient {
   private client: AxiosInstance;
   private authMode: AuthMode;
 
-  constructor(baseURL: string, authMode: AuthMode = 'session', token?: string) {
+  constructor(baseURL: string, authMode: AuthMode = 'jwt', token?: string) {
     this.authMode = authMode;
     this.client = axios.create({
       baseURL,
@@ -26,6 +26,13 @@ class ApiClient {
       console.warn('setToken utilisé alors que authMode != jwt');
     }
     this.client.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  }
+
+  addInterceptor<T>(
+      onFulfilled?: (response: AxiosResponse<T>) => AxiosResponse<T> | Promise<AxiosResponse<T>>,
+      onRejected?: (error: AxiosError) => Promise<AxiosResponse<T>> | Promise<never>
+  ): void {
+    this.client.interceptors.response.use(onFulfilled, onRejected);
   }
 
   // GET sur une route spécifique
