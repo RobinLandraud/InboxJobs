@@ -20,9 +20,15 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('candidatures.urls')),
     path('api/', include('pong.urls')),
+    path('api/', include('users.urls')),
     # JWT Auth
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
+
+# Custom error handlers for JSON responses
+handler400 = 'InboxJobs.error_handlers.custom_400_view'
+handler403 = 'InboxJobs.error_handlers.custom_403_view'
+handler404 = 'InboxJobs.error_handlers.custom_404_view'
+handler500 = 'InboxJobs.error_handlers.custom_500_view'
