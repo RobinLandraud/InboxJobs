@@ -1,0 +1,14 @@
+FROM node:22
+
+WORKDIR /app
+COPY inboxjobs/package*.json ./
+RUN npm install
+
+COPY inboxjobs/ .
+# no npm run build
+
+# Expose port 3000 pour hot-reload
+EXPOSE 3000
+
+# Lancer le serveur de dev React
+CMD ["npm", "start"]
