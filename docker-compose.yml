@@ -1,0 +1,81 @@
+services:
+  backend-prod:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: backend-prod
+    ports:
+      - "8000:8000" # Map port 8000 of the container to port 8000 on the host
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: db
+    profiles:
+      - prod
+      - ''
+    depends_on:
+      - db
+    
+  backend-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: backend-dev
+    ports:
+      - "8000:8000" # Map port 8000 of the container to port 8000 on the host
+    volumes:
+      - ./backend/InboxJobs:/app # Sync the backend code for development
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: db
+    profiles:
+      - dev
+    depends_on:
+      - db
+
+  frontend-prod:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: frontend-prod
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend-prod
+    profiles:
+      - prod
+      - '' # Make production the default profile
+
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: frontend-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/inboxjobs:/app # Sync the frontend code for development
+    depends_on:
+      - backend-dev
+    profiles:
+      - dev
+
+  db:
+    image: postgres:16
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PORT: 5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
