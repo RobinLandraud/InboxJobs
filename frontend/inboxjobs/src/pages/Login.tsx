@@ -3,18 +3,21 @@ import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 
 const LoginPage: React.FC = () => {
-  const { login, user } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent) => {
+    // Prevent the default form submission behavior which would:
+    // - reload the page
+    // - send data to actions attribute of form (not set here)
     e.preventDefault();
     setError("");
     try {
       await login(username, password);
-      navigate("/"); // Redirige vers la home
+      navigate("/");
     } catch {
       setError("Identifiants incorrects.");
     }
