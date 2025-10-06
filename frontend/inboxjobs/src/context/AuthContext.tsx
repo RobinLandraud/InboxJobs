@@ -1,8 +1,9 @@
-import React, { createContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useState, useEffect, ReactNode, useRef } from "react";
 import { authService } from "../services/authService";
 import { apiClient } from "../services/api";
 
 interface User {
+    id: number;
     username: string;
     email: string;
 }
@@ -19,8 +20,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const initialized = useRef(false);
 
     useEffect(() => {
+        if (initialized.current) return;
+        initialized.current = true;
+
         const token = localStorage.getItem("access_token");
         if (token) {
             apiClient.setToken(token);
@@ -35,7 +40,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const handleLogin = async (username: string, password: string): Promise<void> => {
         await authService.login(username, password);
-        const userData = await apiClient.get<User>("/me");
+        const userData = await apiClient.get<User>("/me/");
         setUser(userData);
     };
 
