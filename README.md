@@ -95,10 +95,10 @@ docker compose --profile prod up --build
 
 ## 🧩 Docker Profiles
 
-| Profile        | Description                                    | Containers Launched                   |
-| -------------- | ---------------------------------------------- | ------------------------------------- |
-| `dev`          | Development mode (hot reload, mounted volumes) | `backend-dev`, `frontend-dev`, `db`   |
-| `prod` or `''` | Optimized production mode                      | `backend-prod`, `frontend-prod`, `db` |
+| Profile        | Description                                    | Containers Launched                            |
+| -------------- | ---------------------------------------------- | ---------------------------------------------- |
+| `dev`          | Development mode (hot reload, mounted volumes) | `backend-dev`, `frontend-dev`, `db`, `redis`   |
+| `prod` or `''` | Optimized production mode                      | `backend-prod`, `frontend-prod`, `db`, `redis` |
 
 > If no profile is specified, `prod` is used by default.
 
