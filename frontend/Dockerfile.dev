@@ -4,6 +4,9 @@ WORKDIR /app
 COPY inboxjobs/package*.json ./
 RUN npm install
 
+# avoid erasing node_modules by volume mounting
+VOLUME [ "/app/node_modules" ]
+
 COPY inboxjobs/ .
 # no npm run build
 
