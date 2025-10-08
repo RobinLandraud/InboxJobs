@@ -11,12 +11,16 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_HOST: db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 1
     profiles:
       - prod
       - '' # Make production the default profile
     depends_on:
       - db
-    
+      - redis
+
   backend-dev:
     build:
       context: ./backend
@@ -31,10 +35,14 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_HOST: db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 1
     profiles:
       - dev
     depends_on:
       - db
+      - redis
 
   frontend-prod:
     build:
@@ -66,7 +74,7 @@ services:
   db:
     image: postgres:16
     container_name: postgres_db
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -77,5 +85,14 @@ services:
     ports:
       - "5432:5432"
 
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
 volumes:
   postgres_data:
+  redis_data:
