@@ -114,9 +114,9 @@ Local connection:
 ```
 host: localhost
 port: 5432
-user: inboxuser
-password: inboxpass
-db: inboxjobs
+user: ${POSTGRES_USER}
+password: ${POSTGRES_PASSWORD}
+db: ${POSTGRES_DB}
 ```
 
 ---
@@ -132,7 +132,7 @@ docker compose exec backend-dev python manage.py createsuperuser
 Connect to the database:
 
 ```bash
-docker exec -it postgres_db psql -U ${inboxuser} -d ${inboxjobs}
+docker exec -it postgres_db psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
 ```
 
 ---
