@@ -13,7 +13,7 @@ services:
       POSTGRES_HOST: db
     profiles:
       - prod
-      - ''
+      - '' # Make production the default profile
     depends_on:
       - db
     
@@ -23,7 +23,7 @@ services:
       dockerfile: Dockerfile.dev
     container_name: backend-dev
     ports:
-      - "8000:8000" # Map port 8000 of the container to port 8000 on the host
+      - "8000:8000"
     volumes:
       - ./backend/InboxJobs:/app # Sync the backend code for development
     environment:
@@ -47,7 +47,7 @@ services:
       - backend-prod
     profiles:
       - prod
-      - '' # Make production the default profile
+      - ''
 
   frontend-dev:
     build:
@@ -57,7 +57,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend/inboxjobs:/app # Sync the frontend code for development
+      - ./frontend/inboxjobs:/app
     depends_on:
       - backend-dev
     profiles:
