@@ -5,6 +5,7 @@ The project includes:
 - A **Django REST API backend**
 - A **React frontend**
 - A **PostgreSQL database**
+- A **Redis cache**
 
 The entire application is fully dockerized and can be launched using **Docker Compose**.
 
@@ -133,6 +134,12 @@ Connect to the database:
 
 ```bash
 docker exec -it postgres_db psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+```
+
+Check Redis keys:
+
+```bash
+docker exec -it redis redis-cli
 ```
 
 ---
