@@ -29,7 +29,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         const token = localStorage.getItem("access_token");
         if (token) {
             apiClient.setToken(token);
-            apiClient.get<User>("/me").then(setUser).catch(() => {
+            apiClient.get<User>("/me/").then(setUser).catch(() => {
                 setUser(null);
                 authService.logout();
             }).finally(() => { setLoading(false); });
