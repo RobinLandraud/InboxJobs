@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosInstance, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
 
 type AuthMode = 'jwt' | 'session';
 
@@ -63,6 +63,11 @@ class ApiClient {
   async delete<T>(route: string): Promise<T> {
     const response: AxiosResponse<T> = await this.client.delete(route);
     return response.data;
+  }
+
+  async request<T>(config: InternalAxiosRequestConfig): Promise<AxiosResponse<T>> {
+    const response: AxiosResponse<T> = await this.client(config);
+    return response;
   }
 }
 

@@ -6,10 +6,6 @@ interface TokenResponse {
   refresh: string;
 }
 
-interface InternalAxiosRequestConfigWithRetry extends InternalAxiosRequestConfig {
-  _retry?: boolean;
-}
-
 export const authService = {
     login: async (username: string, password: string): Promise<void> => {
         const response = await apiClient.post<TokenResponse>('/token/', { username, password });
@@ -44,13 +40,13 @@ export const authService = {
         apiClient.addInterceptor<any>(
             (response) => response,
             async (error: AxiosError): Promise<any> => {
-                const originalRequest: InternalAxiosRequestConfigWithRetry | undefined = error.config;
-                if (!originalRequest) {
+                const originalRequest: InternalAxiosRequestConfig | undefined = error.config;
+                if (!originalRequest || originalRequest.url?.includes('/token/refresh/') ) {
+                    authService.logout();
                     return Promise.reject(error);
                 }
 
-                if (error.response?.status === 401 && !originalRequest._retry) {
-                    originalRequest._retry = true;
+                if (error.response?.status === 401) {
                     const refreshToken = localStorage.getItem("refresh_token");
                     if (!refreshToken) {
                         authService.logout();
@@ -59,7 +55,7 @@ export const authService = {
                     try {
                         await authService.refreshToken();
                         originalRequest.headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`;
-                        return apiClient['client'](originalRequest);
+                        return apiClient.request(originalRequest);
                     } catch (err) {
                         authService.logout();
                         return Promise.reject(err);
