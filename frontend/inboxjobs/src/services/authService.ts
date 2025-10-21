@@ -46,7 +46,7 @@ export const authService = {
             try {
                 await authService.refreshToken();
                 const access = localStorage.getItem("access_token");
-                const originalRequest: InternalAxiosRequestConfig = error.config
+                const originalRequest: InternalAxiosRequestConfig | undefined = error.config;
                 if (!access || !originalRequest) {
                     return Promise.reject(error);
                 }
