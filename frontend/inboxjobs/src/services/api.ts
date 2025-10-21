@@ -1,10 +1,87 @@
-import axios, { AxiosInstance, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios, {
+  AxiosInstance,
+  AxiosResponse,
+  AxiosError,
+  InternalAxiosRequestConfig,
+  AxiosRequestHeaders
+} from 'axios';
 
 type AuthMode = 'jwt' | 'session';
+
+interface RetriableInternalAxiosRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+  url: string;
+  headers: AxiosRequestHeaders;
+}
+
+type ErrorHandler = (
+  error: AxiosError
+) => Promise<any>;
+
+class ErrorInterceptorManager {
+  private errorHandlers: Map<number, ErrorHandler> = new Map<number, ErrorHandler>();
+  private excludedRoutes: Set<string> = new Set<string>();
+
+  constructor(client: AxiosInstance) {
+    client.interceptors.response.use(
+      (response: AxiosResponse): AxiosResponse => response,
+      async (error: AxiosError): Promise<AxiosResponse<any>> => {
+        const originalRequest = error.config as RetriableInternalAxiosRequestConfig;
+
+        if (!originalRequest || originalRequest._retry || this.isExcluded(originalRequest.url)) {
+          return Promise.reject(error);
+        }
+
+        const status: number | undefined = error.response?.status;
+        originalRequest._retry = true;
+
+        if (status && this.errorHandlers.has(status)) {
+          const handler: ErrorHandler = this.errorHandlers.get(status)!;
+          return handler(error);
+        }
+
+        return Promise.reject(error);
+      }
+    );
+  }
+
+  addHandler(status: number, handler: ErrorHandler): void {
+    this.errorHandlers.set(status, handler);
+  }
+
+  removeHandler(status: number): void {
+    this.errorHandlers.delete(status);
+  }
+
+  getHandler(status?: number): ErrorHandler | undefined {
+    return status ? this.errorHandlers.get(status) : undefined;
+  }
+
+  hasHandler(status: number): boolean {
+    return this.errorHandlers.has(status);
+  }
+
+  addExcludedRoute(route: string): void {
+    this.excludedRoutes.add(route);
+  }
+
+  addExcludedRoutes(routes: string[]): void {
+    routes.forEach((r) => this.excludedRoutes.add(r));
+  }
+
+  removeExcludedRoute(route: string): void {
+    this.excludedRoutes.delete(route);
+  }
+
+  isExcluded(url: string): boolean {
+    return this.excludedRoutes.has(url);
+  }
+}
 
 class ApiClient {
   private client: AxiosInstance;
   private authMode: AuthMode;
+  readonly errorManager: ErrorInterceptorManager;
 
   constructor(baseURL: string, authMode: AuthMode = 'jwt', token?: string) {
     this.authMode = authMode;
@@ -17,7 +94,8 @@ class ApiClient {
     });
     if (authMode === 'jwt' && token) {
       this.setToken(token);
-    };
+    }
+    this.errorManager = new ErrorInterceptorManager(this.client);
   }
 
   // Gestion token si JWT
@@ -26,13 +104,6 @@ class ApiClient {
       console.warn('setToken utilisé alors que authMode != jwt');
     }
     this.client.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  }
-
-  addInterceptor<T>(
-      onFulfilled?: (response: AxiosResponse<T>) => AxiosResponse<T> | Promise<AxiosResponse<T>>,
-      onRejected?: (error: AxiosError) => Promise<AxiosResponse<T>> | Promise<never>
-  ): void {
-    this.client.interceptors.response.use(onFulfilled, onRejected);
   }
 
   // GET sur une route spécifique

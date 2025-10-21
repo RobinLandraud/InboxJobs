@@ -7,7 +7,7 @@ import reportWebVitals from './reportWebVitals';
 import { authService } from "./services/authService";
 import { AuthProvider } from "./context/AuthContext";
 
-authService.initInterceptor();
+authService.init401Handler();
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

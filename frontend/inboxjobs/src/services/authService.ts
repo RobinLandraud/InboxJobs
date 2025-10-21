@@ -1,15 +1,9 @@
-import { InternalAxiosRequestConfig, AxiosError, AxiosRequestHeaders } from "axios";
+import { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { apiClient } from "./api";
 
 interface TokenResponse {
   access: string;
   refresh: string;
-}
-
-interface RetriableInternalAxiosRequestConfig extends InternalAxiosRequestConfig {
-  _retry?: boolean;
-  url: string;
-  headers: AxiosRequestHeaders;
 }
 
 export const authService = {
@@ -42,39 +36,29 @@ export const authService = {
         //
     },
 
-    initInterceptor: (): void => {
-        apiClient.addInterceptor<any>(
-            (response) => response,
-            async (error: AxiosError): Promise<any> => {
-                const originalRequest: RetriableInternalAxiosRequestConfig | undefined = error.config as RetriableInternalAxiosRequestConfig;
-
-                if (!originalRequest || originalRequest._retry || originalRequest.url?.includes('/token/refresh/')) {
+    init401Handler: (): void => {
+        apiClient.errorManager.addHandler(401, async (error: AxiosError): Promise<any> => {
+            const refreshToken = localStorage.getItem("refresh_token");
+            if (!refreshToken) {
+                authService.logout();
+                return Promise.reject(error);
+            }
+            try {
+                await authService.refreshToken();
+                const access = localStorage.getItem("access_token");
+                const originalRequest: InternalAxiosRequestConfig = error.config
+                if (!access || !originalRequest) {
                     return Promise.reject(error);
                 }
-
-                const status = error.response?.status;
-                originalRequest._retry = true;
-
-                switch (status) {
-                    case 401:
-                        const refreshToken = localStorage.getItem("refresh_token");
-                        if (!refreshToken) {
-                            authService.logout();
-                            return Promise.reject(error);
-                        }
-                        try {
-                            await authService.refreshToken();
-                            originalRequest.headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`;
-                            return apiClient.request(originalRequest);
-                        } catch (err) {
-                            authService.logout();
-                            return Promise.reject(err);
-                        }
-                    default:
-                        return Promise.reject(error);
-                }
+                originalRequest.headers["Authorization"] = `Bearer ${access}`;
+                return apiClient.request(originalRequest);
+            } catch (err) {
+                authService.logout();
+                return Promise.reject(err);
             }
-        );
-    }
+        });
+        apiClient.errorManager.addExcludedRoute('/token/refresh/');
+    },
+    
 };
   
