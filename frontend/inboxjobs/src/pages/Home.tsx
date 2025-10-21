@@ -1,13 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import Loader from "../components/Loader";
 
 const Home: React.FC = () => {
     const navigate = useNavigate();
     const { user, loading } = useAuth();
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <Loader />;
     }
 
     return (
