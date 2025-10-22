@@ -8,5 +8,6 @@ export default defineConfig({
   },
   server: {
     port: 3000, // Default CRA port
+    host: true, // Allow access from network
   },
 });

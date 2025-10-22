@@ -14,4 +14,4 @@ COPY inboxjobs/ .
 EXPOSE 3000
 
 # Lancer le serveur de dev React
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]
