@@ -29,19 +29,34 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         const token = localStorage.getItem("access_token");
         if (token) {
             apiClient.setToken(token);
-            apiClient.get<User>("/me/").then(setUser).catch(() => {
+            apiClient.get<User>("/me/")
+            .then((user) => {
+                setUser(user);
+            })
+            .catch(() => {
                 setUser(null);
                 authService.logout();
-            }).finally(() => { setLoading(false); });
+            })
+            .finally(() => {
+                setLoading(false);
+            });
         } else {
             setLoading(false);
         }
     }, []);
 
     const handleLogin = async (username: string, password: string): Promise<void> => {
-        await authService.login(username, password);
-        const userData = await apiClient.get<User>("/me/");
-        setUser(userData);
+        setLoading(true);
+        try {
+            await authService.login(username, password);
+            const userData = await apiClient.get<User>("/me/");
+            setUser(userData);
+        } catch (error) {
+            setUser(null);
+            throw error;
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleLogout = (): void => {

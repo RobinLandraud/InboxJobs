@@ -1,18 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import Loader from "../components/Loader";
 
 const LoginPage: React.FC = () => {
-  const { login } = useAuth();
+  const { login, loading } = useAuth();
   const navigate = useNavigate();
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    // Prevent the default form submission behavior which would:
-    // - reload the page
-    // - send data to actions attribute of form (not set here)
     e.preventDefault();
     setError("");
     try {
@@ -22,6 +20,10 @@ const LoginPage: React.FC = () => {
       setError("Identifiants incorrects.");
     }
   };
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <main className="flex flex-col items-center justify-center h-screen">
