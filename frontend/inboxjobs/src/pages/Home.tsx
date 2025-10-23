@@ -12,21 +12,32 @@ const Home: React.FC = () => {
     }
 
     return (
-        <main>
-            <h1>Welcome to InboxJobs</h1>
-            {user ? (
-                <div>
-                    <p>Hello, {user.username}!</p>
-                    <button onClick={() => navigate("/dashboard")}>Go to Dashboard</button>
-                </div>
-            ) : (
-                <div>
-                    <p>Please log in to access your dashboard.</p>
-                    <button onClick={() => navigate("/login")}>Login</button>
-                </div>
-            )}
-        </main>
-    );
+      <main className="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-gray-800 p-6">
+        <h1 className="text-4xl font-bold mb-6 text-blue-600">Welcome to InboxJobs</h1>
+
+        {user ? (
+            <div className="text-center space-y-4">
+            <p className="text-lg">Hello, <span className="font-semibold">{user.username}</span>!</p>
+            <button
+                onClick={() => navigate("/dashboard")}
+                className="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+            >
+                Go to Dashboard
+            </button>
+            </div>
+        ) : (
+            <div className="text-center space-y-4">
+            <p className="text-lg">Please log in to access your dashboard.</p>
+            <button
+                onClick={() => navigate("/login")}
+                className="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+            >
+                Login
+            </button>
+            </div>
+        )}
+      </main>
+  );
 };
 
 export default Home;
