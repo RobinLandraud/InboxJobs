@@ -49,7 +49,8 @@ const LoginPage: React.FC = () => {
         ) : (
           <button
             type="button"
-            className="bg-blue-400 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+            disabled
+            className="bg-blue-400 text-white font-semibold py-2 px-4 rounded"
           >
             Chargement...
           </button>
