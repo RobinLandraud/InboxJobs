@@ -4,6 +4,7 @@
 The project includes:
 - A **Django REST API backend**
 - A **React frontend** built with **Vite**
+- A **Tailwind CSS frontend framework** for responsive and elegant styling
 - A **PostgreSQL database**
 - A **Redis cache**
 - A **Nginx server** to serve the frontend in production
