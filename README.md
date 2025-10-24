@@ -2,7 +2,7 @@
 
 **InboxJobs** is a web application for managing and tracking job offers.  
 The project includes:
-- A **Django REST API backend** for handling requests and business logic
+- A **Django REST API backend** for handling requests and logic
 - A **React frontend** built with **Vite** for fast and modern UI
 - A **Tailwind CSS frontend framework** for responsive and elegant styling
 - A **PostgreSQL database** for reliable data storage
