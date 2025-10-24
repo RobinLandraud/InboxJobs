@@ -11,6 +11,7 @@ interface User {
 interface AuthContextType {
     user: User | null;
     loading: boolean;
+    initialized: boolean;
     login: (username: string, password: string) => Promise<void>;
     logout: () => void;
 }
@@ -20,11 +21,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    const initialized = useRef(false);
+    const [initialized, setInitialized] = useState<boolean>(false);
 
     useEffect(() => {
-        if (initialized.current) return;
-        initialized.current = true;
+        if (initialized) return;
 
         const token = localStorage.getItem("access_token");
         if (token) {
@@ -39,9 +39,11 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             })
             .finally(() => {
                 setLoading(false);
+                setInitialized(true);
             });
         } else {
             setLoading(false);
+            setInitialized(true);
         }
     }, []);
 
@@ -65,7 +67,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, login: handleLogin, logout: handleLogout }}>
+        <AuthContext.Provider value={{ user, loading, initialized, login: handleLogin, logout: handleLogout }}>
             {children}
         </AuthContext.Provider>
     );
