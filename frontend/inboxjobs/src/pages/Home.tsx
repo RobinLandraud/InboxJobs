@@ -12,7 +12,7 @@ const Home: React.FC = () => {
     }
 
     return (
-      <main className="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-gray-800 p-6">
+      <main className="bg-slate-950 flex flex-col items-center justify-center min-h-screen text-gray-800 p-6">
         <h1 className="text-4xl font-bold mb-6 text-blue-600">Welcome to InboxJobs</h1>
 
         {user ? (
