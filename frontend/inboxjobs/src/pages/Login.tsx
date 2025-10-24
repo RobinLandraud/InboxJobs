@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import Loader from "../components/Loader";
 
 const LoginPage: React.FC = () => {
   const { login, loading } = useAuth();
@@ -20,10 +19,6 @@ const LoginPage: React.FC = () => {
       setError("Identifiants incorrects.");
     }
   };
-
-  if (loading) {
-    return <Loader />;
-  }
 
   return (
     <main className="flex flex-col items-center justify-center h-screen">
@@ -44,12 +39,21 @@ const LoginPage: React.FC = () => {
           className="border border-gray-300 rounded px-3 py-2"
         />
         {error && <p className="text-red-500 text-sm">{error}</p>}
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-        >
-          Se connecter
-        </button>
+        { !loading ? (
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+          >
+            Se connecter
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="bg-blue-400 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+          >
+            Chargement...
+          </button>
+        )}
       </form>
     </main>
   );
