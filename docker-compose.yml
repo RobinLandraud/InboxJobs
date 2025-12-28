@@ -65,7 +65,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend/inboxjobs:/app
+      - ./frontend/linkout:/app
     depends_on:
       - backend-dev
     profiles:

@@ -1,13 +1,13 @@
 FROM node:22
 
 WORKDIR /app
-COPY inboxjobs/package*.json ./
+COPY linkout/package*.json ./
 RUN npm install
 
 # avoid erasing node_modules by volume mounting
 VOLUME [ "/app/node_modules" ]
 
-COPY inboxjobs/ .
+COPY linkout/ .
 # no npm run build
 
 # Expose port 3000 pour hot-reload

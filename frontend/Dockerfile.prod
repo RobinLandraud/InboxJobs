@@ -2,10 +2,10 @@
 FROM node:22 AS build
 
 WORKDIR /app
-COPY inboxjobs/package*.json ./
+COPY linkout/package*.json ./
 RUN npm install
 
-COPY inboxjobs/ .
+COPY linkout/ .
 RUN npm run build
 
 # Nginx stage
