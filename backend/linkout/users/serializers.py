@@ -55,3 +55,9 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         UserProfile.objects.create(user=user, **profile_data)
         return user
+
+class MeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']
+        read_only_fields = ['id']

@@ -174,10 +174,6 @@ export default function Home() {
           <p className="text-base sm:text-lg md:text-xl text-orange-800 mb-8 sm:mb-10 leading-relaxed max-w-2xl mx-auto px-4">
             Rencontrez d'autres personnes ou groupes qui partagent vos passions pour des sorties conviviales et amusantes.
           </p>
-          
-          <button className="px-8 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-full text-base sm:text-lg font-semibold hover:from-orange-600 hover:to-yellow-600 shadow-2xl shadow-orange-300 transform hover:scale-105 transition">
-            Commencer l'aventure
-          </button>
         </div>
 
         {/* Illustration Cards */}
