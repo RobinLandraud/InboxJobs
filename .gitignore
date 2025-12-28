@@ -1,6 +1,6 @@
 .env
 db.sqlite3
-backend/inboxjobs/db.sqlite3
+backend/linkout/db.sqlite3
 *.log
 
 __pycache__/
