@@ -1,18 +1,25 @@
 import React, { useState } from 'react';
 import { Users, ArrowRight, ArrowLeft, Check } from 'lucide-react';
+import { apiClient } from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 export default function RegisterPage() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     age: '',
+    password: '',
     interests: [] as string[],
     description: ''
   });
 
-  const totalSteps = 5;
+  const totalSteps = 6;
 
   const interestOptions = [
     '🏃 Sport',
@@ -55,9 +62,28 @@ export default function RegisterPage() {
     }
   };
 
-  const handleSubmit = () => {
-    console.log('Form submitted:', formData);
-    // Logique d'inscription ici
+  const handleSubmit = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      // Appel à l'API pour créer le compte
+      await apiClient.post('/register/', {
+        email: formData.email,
+        password: formData.password,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        age: parseInt(formData.age),
+        interests: formData.interests,
+        description: formData.description
+      });
+      
+      // Redirection vers la page de connexion après inscription réussie
+      navigate('/login');
+    } catch (err: any) {
+      setError(err?.response?.data || 'Une erreur est survenue lors de l\'inscription');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isStepValid = () => {
@@ -69,8 +95,10 @@ export default function RegisterPage() {
       case 3:
         return formData.age !== '' && parseInt(formData.age) >= 18;
       case 4:
-        return formData.interests.length > 0;
+        return formData.password.length >= 8;
       case 5:
+        return formData.interests.length > 0;
+      case 6:
         return formData.description.trim().length >= 20;
       default:
         return false;
@@ -193,8 +221,35 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {/* Step 4: Centres d'intérêt */}
+          {/* Step 4: Mot de passe */}
           {currentStep === 4 && (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold text-orange-900 mb-2">
+                  Choisissez un mot de passe
+                </h2>
+                <p className="text-orange-700">Minimum 8 caractères</p>
+              </div>
+              <div>
+                <label className="block text-orange-900 font-medium mb-2">
+                  Mot de passe
+                </label>
+                <input
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-orange-200 focus:border-orange-500 focus:outline-none transition"
+                  placeholder="••••••••"
+                />
+                <p className="text-sm text-orange-600 mt-2">
+                  {formData.password.length} / 8 caractères minimum
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Step 5: Centres d'intérêt */}
+          {currentStep === 5 && (
             <div className="space-y-6">
               <div>
                 <h2 className="text-2xl font-bold text-orange-900 mb-2">
@@ -222,8 +277,8 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {/* Step 5: Description */}
-          {currentStep === 5 && (
+          {/* Step 6: Description */}
+          {currentStep === 6 && (
             <div className="space-y-6">
               <div>
                 <h2 className="text-2xl font-bold text-orange-900 mb-2">
@@ -248,6 +303,12 @@ export default function RegisterPage() {
                   {formData.description.length} / 20 caractères minimum
                 </p>
               </div>
+            </div>
+          )}
+          {/* Error Message */}
+          {error && (
+            <div className="mt-6 bg-red-50 border-2 border-red-200 rounded-xl p-4">
+              <p className="text-red-600 text-sm font-medium">{error}</p>
             </div>
           )}
         </div>
@@ -296,7 +357,9 @@ export default function RegisterPage() {
         {/* Footer */}
         <div className="text-center mt-6 text-orange-700">
           Vous avez déjà un compte ?{' '}
-          <button className="text-orange-600 font-semibold hover:text-orange-800 transition">
+          <button className="text-orange-600 font-semibold hover:text-orange-800 transition"
+            onClick={() => navigate('/login')}
+            >
             Connectez-vous
           </button>
         </div>
