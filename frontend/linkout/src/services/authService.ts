@@ -7,8 +7,8 @@ interface TokenResponse {
 }
 
 export const authService = {
-    login: async (username: string, password: string): Promise<void> => {
-        const response = await apiClient.post<TokenResponse>('/token/', { username, password });
+    login: async (email: string, password: string): Promise<void> => {
+        const response = await apiClient.post<TokenResponse>('/login/', { email, password });
 
         const { access, refresh } = response;
 
@@ -24,7 +24,7 @@ export const authService = {
             throw new Error('No refresh token available');
         }
         
-        const response = await apiClient.post<TokenResponse>('/token/refresh/', { refresh });
+        const response = await apiClient.post<TokenResponse>('/refresh/', { refresh });
         const { access } = response;    
         localStorage.setItem('access_token', access);
         apiClient.setToken(access);

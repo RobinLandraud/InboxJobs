@@ -80,7 +80,18 @@ export default function RegisterPage() {
       // Redirection vers la page de connexion après inscription réussie
       navigate('/login');
     } catch (err: any) {
-      setError(err?.response?.data || 'Une erreur est survenue lors de l\'inscription');
+      if (err.response?.data) {
+        if (typeof err.response.data === 'object') {
+          const messages = Object.entries(err.response.data).map(
+            ([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`
+          );
+          setError(messages.join(' | '));
+        } else {
+          setError(String(err.response.data));
+        }
+      } else {
+        setError('Une erreur est survenue lors de l\'inscription');
+      }
     } finally {
       setLoading(false);
     }
@@ -341,15 +352,14 @@ export default function RegisterPage() {
           ) : (
             <button
               onClick={handleSubmit}
-              disabled={!isStepValid()}
+              disabled={!isStepValid() || loading}
               className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold transition ${
                 isStepValid()
                   ? 'bg-gradient-to-r from-orange-500 to-yellow-500 text-white hover:from-orange-600 hover:to-yellow-600 shadow-lg shadow-orange-200'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
-              <Check className="w-5 h-5" />
-              Créer mon compte
+              {loading ? 'Création...' : <><Check className="w-5 h-5" /> Créer mon compte</>}
             </button>
           )}
         </div>

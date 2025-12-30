@@ -47,10 +47,10 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         }
     }, []);
 
-    const handleLogin = async (username: string, password: string): Promise<void> => {
+    const handleLogin = async (email: string, password: string): Promise<void> => {
         setLoading(true);
         try {
-            await authService.login(username, password);
+            await authService.login(email, password);
             const userData = await apiClient.get<User>("/me/");
             setUser(userData);
         } catch (error) {
