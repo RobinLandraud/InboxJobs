@@ -1,24 +1,15 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.models import User
-from .models import UserProfile
+from django.contrib.auth.admin import UserAdmin
+from .models import CustomUser
 
-class UserProfileInline(admin.StackedInline):
-    model = UserProfile
-    can_delete = False
-    verbose_name_plural = 'Profile'
-
-class UserAdmin(BaseUserAdmin):
-    inlines = (UserProfileInline,)
-    list_display = ('username', 'email', 'get_age', 'get_interests')
-    
-    def get_age(self, obj):
-        return obj.profile.age
-    get_age.short_description = 'Age'
-
-    def get_interests(self, obj):
-        return ", ".join(obj.profile.interests)
-    get_interests.short_description = 'Interests'
-
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
+@admin.register(CustomUser)
+class CustomUserAdmin(UserAdmin):
+    model = CustomUser
+    list_display = ('email', 'is_staff', 'is_active')  # supprime get_full_name et age
+    list_filter = ('is_staff', 'is_active')
+    search_fields = ('email',)
+    ordering = ('email',)
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active')}),
+    )

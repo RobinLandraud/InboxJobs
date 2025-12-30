@@ -12,6 +12,21 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from datetime import timedelta
+
+# Custom user model
+AUTH_USER_MODEL = "users.CustomUser"
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+# Configuration JWT (si vous utilisez simplejwt)
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +40,6 @@ SECRET_KEY = 'django-insecure--lg^5jthm*4tw#y%3_)!m)f24e#a++ozxug3wlice%sd%si_yf
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 
 # Hosts/domain names that are valid for this site
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]"]
