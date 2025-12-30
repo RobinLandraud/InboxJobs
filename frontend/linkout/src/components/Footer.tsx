@@ -1,7 +1,9 @@
 import React, { useState} from "react";
 import { Users } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
 
 const Header: React.FC = () => {
+    const navigate = useNavigate();
 
     return (
         <footer className="container mx-auto px-6 py-12 border-t border-orange-200">
@@ -22,14 +24,19 @@ const Header: React.FC = () => {
                 <span className="text-xl font-bold text-orange-600">LinkOut</span>
             </div>
             <div className="flex gap-8 text-orange-700">
-                <a href="#" className="hover:text-orange-900 transition">À propos</a>
-                <a href="#" className="hover:text-orange-900 transition">Contact</a>
-                <a href="#" className="hover:text-orange-900 transition">Confidentialité</a>
-                <a href="#" className="hover:text-orange-900 transition">CGU</a>
+                <button className="hover:text-orange-900 transition"
+                    onClick={() => navigate('/loneliness')}
+                >À propos</button>
+                <button className="hover:text-orange-900 transition"
+                    onClick={() => navigate('/contact')}
+                >Contact</button>
+                <button className="hover:text-orange-900 transition"
+                    onClick={() => navigate('/cgu')}
+                >CGU</button>
             </div>
             </div>
             <div className="text-center mt-8 text-orange-600">
-            © 2024 GroupMeet. Tous droits réservés.
+            © 2025 LinkOut. Tous droits réservés.
             </div>
         </footer>
     );

@@ -292,7 +292,10 @@ export default function Home() {
           <p className="text-base sm:text-lg md:text-xl text-orange-50 mb-6 sm:mb-8 px-2">
             Rejoignez GroupMeet dès aujourd'hui et commencez à créer des souvenirs inoubliables
           </p>
-          <button className="px-8 sm:px-10 py-3 sm:py-4 bg-white text-orange-600 rounded-full text-base sm:text-lg font-semibold hover:bg-orange-50 shadow-lg transform hover:scale-105 transition">
+          <button className="px-8 sm:px-10 py-3 sm:py-4 bg-white text-orange-600 rounded-full text-base sm:text-lg font-semibold
+            hover:bg-orange-50 shadow-lg transform hover:scale-105 transition"
+            onClick={() => navigate('/register')}
+          >
             Créer mon compte gratuitement
           </button>
         </div>
