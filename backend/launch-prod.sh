@@ -7,6 +7,7 @@ echo "🚀 Lancement du backend DEV sur Kubernetes..."
 docker build -t linkout-backend:prod -f Dockerfile.prod .
 
 # Déployer PostgreSQL et Redis
+kubectl apply -f k8s/postgres-pvc.yaml
 kubectl apply -f k8s/db.yaml
 kubectl apply -f k8s/redis.yaml
 

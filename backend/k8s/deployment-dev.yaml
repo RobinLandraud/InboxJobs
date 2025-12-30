@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: linkout
-          image: linkout-backend:dev  # nom de ton image Docker locale
+          image: linkout-backend:dev  # nom de l'image Docker locale
           imagePullPolicy: Never       # pour utiliser l'image locale
           ports:
             - containerPort: 8000
