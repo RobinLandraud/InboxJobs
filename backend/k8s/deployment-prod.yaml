@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: linkout-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: linkout
+  template:
+    metadata:
+      labels:
+        app: linkout
+    spec:
+      containers:
+        - name: linkout
+          image: linkout-backend:prod
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DJANGO_SETTINGS_MODULE
+              value: "linkout.settings"

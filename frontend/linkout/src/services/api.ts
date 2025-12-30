@@ -143,4 +143,4 @@ class ApiClient {
 }
 
 // Export singleton avec base URL de ton API
-export const apiClient = new ApiClient("http://127.0.0.1:8000/api");
+export const apiClient = new ApiClient("http://127.0.0.1:30001/api");

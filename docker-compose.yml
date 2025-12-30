@@ -1,49 +1,4 @@
 services:
-  backend-prod:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.prod
-    container_name: backend-prod
-    ports:
-      - "8000:8000" # Map port 8000 of the container to port 8000 on the host
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_HOST: db
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_DB: 1
-    profiles:
-      - prod
-      - '' # Make production the default profile
-    depends_on:
-      - db
-      - redis
-
-  backend-dev:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.dev
-    container_name: backend-dev
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./backend/linkout:/app # Sync the backend code for development
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_HOST: db
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_DB: 1
-    profiles:
-      - dev
-    depends_on:
-      - db
-      - redis
-
   frontend-prod:
     build:
       context: ./frontend
@@ -51,8 +6,6 @@ services:
     container_name: frontend-prod
     ports:
       - "3000:80" # Map port 80 of the container to port 3000 on the host
-    depends_on:
-      - backend-prod
     profiles:
       - prod
       - ''
@@ -66,33 +19,5 @@ services:
       - "3000:3000"
     volumes:
       - ./frontend/linkout:/app
-    depends_on:
-      - backend-dev
     profiles:
       - dev
-
-  db:
-    image: postgres:16
-    container_name: postgres_db
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_PORT: 5432
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
-  redis:
-    image: redis:7
-    container_name: redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-
-volumes:
-  postgres_data:
-  redis_data:

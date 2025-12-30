@@ -1,157 +1,155 @@
-# 📬 InboxJobs
+# LinkOut
 
-**InboxJobs** is a web application for managing and tracking job offers.  
-The project includes:
-- A **Django REST API backend** for handling requests and logic
-- A **React frontend** built with **Vite** for fast and modern UI
-- A **Tailwind CSS frontend framework** for responsive and elegant styling
-- A **PostgreSQL database** for reliable data storage
-- A **Redis cache** for fast data access
-- A **Nginx server** to serve the frontend efficiently in production
+[![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?logo=kubernetes&logoColor=white)](https://kubernetes.io/)
 
-The entire application is fully dockerized and can be launched using **Docker Compose**.
+LinkOut est une plateforme qui permet aux utilisateurs de rencontrer d’autres personnes ou groupes partageant leurs passions et loisirs, favorisant les interactions sociales authentiques. L’application met l’accent sur la convivialité et le côté ludique des rencontres.
 
 ---
 
-## 🚀 Prerequisites
+## 🏗 Architecture
 
-Before getting started, make sure you have the following installed:
-
-| Tool | Recommended Version |
-|------|----------------------|
-| **Docker Engine** | ≥ 24.x |
-| **Docker Compose (v2)** | ≥ 2.39 |
-
-> 💡 **Docker Desktop** can be used on macOS and Windows for an easier setup, but it’s optional.  
-> This project runs on **Linux**, **macOS**, and **Windows**.
-
----
-
-## 📁 Project Structure
+### Diagramme simplifié
 
 ```
 
-InboxJobs/
-├── backend/
-│   ├── Dockerfile.dev
-│   ├── Dockerfile.prod
-│   ├── requirements.txt
-│   └── InboxJobs/
-│       ├── manage.py
-│       └── ...
-│
-├── frontend/
-│   ├── Dockerfile.dev
-│   ├── Dockerfile.prod
-│   └── inboxjobs/
-│       ├── index.html
-│       └── ...
-│
-├── docker-compose.yml
-└── .env
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│  Frontend   │ ---> │ Ingress /   │ ---> │ Backend DRF │
+│ React + Vite│      │ Nginx       │      │ PostgreSQL  │
+│ Tailwind    │      │ (K8s)       │      │ Redis       │
+└─────────────┘      └─────────────┘      └─────────────┘
+↑                 ↑
+│                 │
+Docker Compose        Kubernetes Cluster
+│                 │
+localhost:3000     Pods exposés via NodePort / Service
 
 ````
 
 ---
 
-## ⚙️ Configuration
+### Backend
 
-Create a `.env` file at the root of the project (same level as `docker-compose.yml`):
+- **Framework** : Django REST Framework (DRF)  
+- **Base de données** : PostgreSQL  
+- **Cache / Message broker** : Redis  
+- **Orchestration** : Kubernetes  
+  - Backend, DB et Redis sont **clusterisés** pour la haute disponibilité et la résilience.  
+  - Les pods sont exposés via **Services** et un **Ingress** pour gérer le routage HTTP.  
+  - Manifests Kubernetes : `backend/k8s/`  
+- **Scripts de gestion Kubernetes** :  
+  - `backend/launch-dev.sh` → Lancer le cluster backend/dev  
+  - `backend/launch-prod.sh` → Lancer le cluster backend/prod  
+  - `backend/stop.sh` → Stopper le cluster
+
+### Frontend
+
+- **Framework** : React + Vite  
+- **Styling** : Tailwind CSS  
+- **Mode dev** : Docker Compose avec volumes montés pour le rechargement rapide  
+- **Mode prod** : Docker Compose + Nginx pour servir les fichiers statiques et proxy vers le backend
+
+---
+
+## ⚙️ Installation et lancement
+
+### Prérequis
+
+- Docker Desktop avec Kubernetes activé  
+- `kubectl`  
+- Node.js  
+- Docker Compose
+
+### Lancement en développement
+
+1. **Déployer backend + services Kubernetes**
 
 ```bash
-POSTGRES_DB=inboxjobs
-POSTGRES_USER=inboxuser
-POSTGRES_PASSWORD=inboxpass
+cd backend
+./launch-dev.sh
 ````
 
----
-
-## 🧱 Running the Project
-
-### 🔧 Development Mode
-
-Run the **backend** and **frontend** with hot reload enabled:
+2. **Lancer le frontend avec Docker Compose**
 
 ```bash
-docker compose --profile dev up --build
+docker compose -f ../docker-compose.yml --profile dev up
 ```
 
-**Access:**
+3. Accéder à l’application :
 
-* Frontend → [http://localhost:3000](http://localhost:3000)
-* Backend → [http://localhost:8000](http://localhost:8000)
+   * Backend : `http://localhost:30001` (NodePort)
+   * Frontend : `http://localhost:3000`
 
----
+### Lancement en production
 
-### 🏗️ Production Mode
-
-Run the optimized, built version (using Nginx and Django without reload):
+1. **Déployer backend + services Kubernetes**
 
 ```bash
-docker compose --profile prod up --build
+cd backend
+./launch-prod.sh
 ```
 
-**Access:**
-
-* Application → [http://localhost:3000](http://localhost:3000)
-
----
-
-## 🧩 Docker Profiles
-
-| Profile        | Description                                    | Containers Launched                            |
-| -------------- | ---------------------------------------------- | ---------------------------------------------- |
-| `dev`          | Development mode (hot reload, mounted volumes) | `backend-dev`, `frontend-dev`, `db`, `redis`   |
-| `prod` or `''` | Optimized production mode                      | `backend-prod`, `frontend-prod`, `db`, `redis` |
-
-> If no profile is specified, `prod` is used by default.
-
----
-
-## 💾 Database
-
-* Container: `postgres_db`
-* Exposed port: `5432`
-* Data is persisted using the `postgres_data` volume
-
-Local connection:
-
-```
-host: localhost
-port: 5432
-user: ${POSTGRES_USER}
-password: ${POSTGRES_PASSWORD}
-db: ${POSTGRES_DB}
-```
-
----
-
-## ⚙️ Useful Commands
-
-Create a Django superuser:
+2. **Lancer le frontend prod avec Docker Compose / Nginx**
 
 ```bash
-docker compose exec backend-dev python manage.py createsuperuser
+docker compose -f ../docker-compose.yml --profile prod up
 ```
 
-Connect to the database:
+3. Accéder à l’application :
+
+   * Frontend : `http://localhost` ou `http://linkout.local` si Ingress configuré
+
+### Arrêt de l’application
 
 ```bash
-docker exec -it postgres_db psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
-```
-
-Check Redis keys:
-
-```bash
-docker exec -it redis redis-cli
+cd backend
+./stop.sh
 ```
 
 ---
 
-## 🧠 Author
+## 🎨 Fonctionnalités principales
 
-**Robin Landraud**
-AI, Fullstack, and Graphics Computing Developer
-💼 [GitHub](https://github.com/RobinLandraud)
+* Rencontres Solo ou en Groupe
+* Matchs variés (groupes vs groupes, solo vs solo, mix)
+* Planification d’activités
 
 ---
+
+## 🔧 Structure du projet
+
+```
+linkout/
+├─ backend/               
+│  ├─ Dockerfile.dev
+│  ├─ Dockerfile.prod
+│  ├─ k8s/                # Manifests Kubernetes (Deployment, Service, Ingress)
+│  ├─ launch-dev.sh
+│  ├─ launch-prod.sh
+│  ├─ stop.sh
+│  ├─ linkout/
+│  └─ requirements.txt
+├─ frontend/              
+│  ├─ Dockerfile.dev
+│  ├─ Dockerfile.prod
+│  └─ src/                # Pages et composants React
+├─ docker-compose.yml
+└─ README.md
+```
+
+---
+
+## 🔒 Sécurité et meilleures pratiques
+
+* Utilisation de **Secrets Kubernetes** pour les credentials (PostgreSQL, Redis)
+* Séparation dev / prod via Dockerfile et profiles Docker Compose
+* Ingress Controller pour simuler un domaine local (`linkout.local`)
+
+---
+
+## 📌 Notes
+
+* NodePort permet un accès rapide en dev (`localhost:30001`)
+* Ingress Controller permet un accès via nom de domaine local (`linkout.local`)
+* Frontend et backend peuvent être déployés et développés indépendamment
