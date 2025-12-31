@@ -1,0 +1,23 @@
+services:
+  frontend-prod:
+    build:
+      context: ..
+      dockerfile: Dockerfile.prod
+    container_name: standalone-frontend-prod
+    ports:
+      - "3000:80" # Map port 80 of the container to port 3000 on the host
+    profiles:
+      - prod
+      - ''
+
+  frontend-dev:
+    build:
+      context: ..
+      dockerfile: Dockerfile.dev
+    container_name: standalone-frontend-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./linkout:/app
+    profiles:
+      - dev

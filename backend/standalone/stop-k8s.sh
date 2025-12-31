@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+cd ..
+
 echo "🛑 Arrêt du backend et des services Kubernetes..."
 
 # Arrêter le backend
